@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseSocial | Analítica & IA para Redes Sociales</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Librería ligera para gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Barra Lateral -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="logo-icon">⚡</span>
+        <h2>PulseSocial</h2>
+      </div>
+      
+      <nav class="nav-menu">
+        <button class="nav-btn active" data-network="all">📊 Vista Global</button>
+        <button class="nav-btn" data-network="instagram">📸 Instagram</button>
+        <button class="nav-btn" data-network="linkedin">💼 LinkedIn</button>
+        <button class="nav-btn" data-network="x">🐦 X (Twitter)</button>
+      </nav>
+
+      <section class="social-links" aria-labelledby="socialLinksTitle">
+        <div class="social-links-header">
+          <h3 id="socialLinksTitle">Mis redes</h3>
+          <button id="editSocialLinksBtn" class="social-edit-btn" type="button" title="Editar enlaces">✎</button>
+        </div>
+        <div id="socialLinksList" class="social-links-list"></div>
+      </section>
+
+      <div class="api-config">
+        <label for="geminiKey">🔑 API Key de Gemini (Opcional)</label>
+        <input type="password" id="geminiKey" placeholder="Pega tu API Key aquí...">
+        <small>Si se deja vacío, la IA usará el motor de análisis local.</small>
+      </div>
+    </aside>
+
+    <!-- Área Principal -->
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <h1 id="dashboardTitle">Analítica Global de Redes</h1>
+          <p class="subtitle">Últimos 30 días • Actualizado en tiempo real</p>
+        </div>
+        <div class="topbar-actions">
+          <button id="exportCsvBtn" class="btn btn-secondary">⬇️ Exportar CSV</button>
+          <button id="toggleAiBtn" class="btn btn-primary">✨ Asistente IA</button>
+        </div>
+      </header>
+
+      <!-- Tarjetas de KPIs -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">Alcance Total</span>
+          <h3 id="kpiReach">0</h3>
+          <span class="kpi-trend positive" id="trendReach">+0%</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Tasa de Engagement (ER)</span>
+          <h3 id="kpiEngagement">0%</h3>
+          <span class="kpi-trend positive" id="trendEngagement">+0%</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Nuevos Seguidores</span>
+          <h3 id="kpiFollowers">0</h3>
+          <span class="kpi-trend positive" id="trendFollowers">+0%</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Clics en Enlaces</span>
+          <h3 id="kpiClicks">0</h3>
+          <span class="kpi-trend negative" id="trendClicks">-0%</span>
+        </div>
+      </section>
+
+      <!-- Sección de Gráficos -->
+      <section class="charts-grid">
+        <div class="chart-card main-chart">
+          <div class="card-header">
+            <h3>Evolución de Interacciones vs. Alcance</h3>
+          </div>
+          <canvas id="performanceChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="card-header">
+            <h3>Distribución por Formato</h3>
+          </div>
+          <canvas id="formatChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Tabla de Publicaciones y Rendimiento -->
+      <section class="posts-section">
+        <div class="card-header">
+          <h3>Rendimiento de Publicaciones Recientes</h3>
+          <button id="analyzePostsAiBtn" class="btn btn-ai-mini">🧠 Auditar posts con IA</button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Red</th>
+                <th>Publicación</th>
+                <th>Formato</th>
+                <th>Alcance</th>
+                <th>Interacciones</th>
+                <th>ER %</th>
+              </tr>
+            </thead>
+            <tbody id="postsTableBody">
+              <!-- Rellenado dinámicamente por JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- Panel Lateral del Asistente IA -->
+    <aside class="ai-panel" id="aiPanel">
+      <div class="ai-header">
+        <div>
+          <h3>✨ Copiloto Analítico IA</h3>
+          <span class="ai-status" id="aiModeBadge">Modo: Análisis Local</span>
+        </div>
+        <button id="closeAiBtn" class="close-btn">✕</button>
+      </div>
+
+      <div class="ai-quick-prompts">
+        <button class="prompt-chip" data-prompt="Resume el rendimiento actual y dime qué red funciona mejor.">📈 Resumen ejecutivo</button>
+        <button class="prompt-chip" data-prompt="¿Qué formato de contenido tiene mejor engagement y qué debo publicar más?">🎯 Qué publicar más</button>
+        <button class="prompt-chip" data-prompt="Detecta puntos débiles en los datos actuales y dame 3 acciones de mejora.">🛠️ Plan de mejora</button>
+      </div>
+
+      <div class="ai-chat-history" id="aiChatHistory">
+        <div class="ai-message bot">
+          Hola. Tengo acceso directo a las métricas que ves en pantalla. Pregúntame sobre tu tasa de engagement, qué formato rinde más o pídeme una auditoría de tus publicaciones.
+        </div>
+      </div>
+
+      <form class="ai-input-area" id="aiChatForm">
+        <input type="text" id="aiUserInput" placeholder="Pregunta sobre tus métricas..." required autocomplete="off">
+        <button type="submit" class="btn btn-primary">Enviar</button>
+      </form>
+    </aside>
+  </div>
+
+  <dialog id="socialLinksDialog" class="social-dialog">
+    <form id="socialLinksForm" method="dialog">
+      <div class="social-dialog-header">
+        <div>
+          <h3>Enlaces de mis redes</h3>
+          <p>Los enlaces se guardan en este navegador.</p>
+        </div>
+        <button type="button" id="closeSocialLinksBtn" class="close-btn" aria-label="Cerrar">✕</button>
+      </div>
+      <label for="instagramUrl">Instagram</label>
+      <input id="instagramUrl" type="url" placeholder="https://instagram.com/tuusuario">
+      <label for="linkedinUrl">LinkedIn</label>
+      <input id="linkedinUrl" type="url" placeholder="https://linkedin.com/in/tuusuario">
+      <label for="xUrl">X (Twitter)</label>
+      <input id="xUrl" type="url" placeholder="https://x.com/tuusuario">
+      <div class="social-dialog-actions">
+        <button type="button" id="resetSocialLinksBtn" class="btn btn-secondary">Restablecer</button>
+        <button type="submit" class="btn btn-primary">Guardar enlaces</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
